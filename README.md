@@ -21,7 +21,7 @@ Aplicación Java con Spring Boot que consume la API pública de Gutendex para bu
 # 🚀 Instrucciones de uso
 Clonar el repositorio
 ```bash
-git clone https://github.com/reganst93/conversor-de-monedas-desafio-alura.git
+git clone https://github.com/reganst93/LiterAlura.git
 cd LiterAlura
 ```
 Configurar base de datos (PostgreSQL)
