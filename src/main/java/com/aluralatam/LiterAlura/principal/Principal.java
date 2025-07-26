@@ -6,6 +6,8 @@ import com.aluralatam.LiterAlura.service.ConsumoApi;
 import com.aluralatam.LiterAlura.service.ConvierteDatos;
 import org.hibernate.sql.ast.tree.cte.CteSearchClauseKind;
 import com.aluralatam.LiterAlura.model.ResultadoApi;
+
+import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
 
@@ -30,7 +32,6 @@ public class Principal {
                     2 - Listar libros registrados
                     3 - Listar autores registrados
                     4 - Listar autores vivos en determinado año
-                    5 - Listar libros por idioma
                     0 - Salir
                     """;
             System.out.println(menu);
@@ -41,17 +42,14 @@ public class Principal {
                 case 1:
                     buscarLibroPorTitulo();
                     break;
-                /*case 2:
+                case 2:
                     ListarLibrosRegistrados();
                     break;
-                case 3:
+                /*case 3:
                     ListarAutoresRegistrados();
                     break;
                 case 4:
                     BuscarAutoresPorAnoNacimiento();
-                    break;
-                case 5:
-                    ListarLibrosPorIdioma();
                     break;*/
                 case 0:
                     System.out.println("Gracias por usar la Aplicacion, Adios");
@@ -61,6 +59,36 @@ public class Principal {
             }
         }
     }
+
+
+    private void imprimirLibroFormato(Libro libro) {
+        System.out.println("----------LIBRO----------");
+        System.out.println("Titulo: " + libro.getTitulo());
+
+        System.out.print("Autor(es): ");
+        if (libro.getAutores() == null || libro.getAutores().isEmpty()) {
+            System.out.println("No disponible");
+        } else {
+            String autores = libro.getAutores().stream()
+                    .map(a -> a.getNombre())
+                    .reduce((a1, a2) -> a1 + ", " + a2)
+                    .orElse("No disponible");
+            System.out.println(autores);
+        }
+
+        System.out.print("Idioma(s): ");
+        if (libro.getIdiomas() == null || libro.getIdiomas().isEmpty()){
+            System.out.println("Idiomas no disponibles");
+        } else {
+            String idiomas = String.join(", ", libro.getIdiomas());
+            System.out.println(idiomas);
+        }
+
+        System.out.println("Número de descargas: " + libro.getNumeroDeDescargas());
+        System.out.println("-------------------");
+    }
+
+
 
     private void buscarLibroPorTitulo() {
         System.out.println("Ingrese el título del libro a buscar");
@@ -79,35 +107,20 @@ public class Principal {
                 Libro libro = resultado.getResultados().get(0);
                 // Guardar libro en base de datos
                 repositorio.save(libro);
-                System.out.println("----------LIBRO----------");
-                System.out.println("Titulo: " + libro.getTitulo());
-                System.out.print("Autor(es): ");
-                if (libro.getAutores() == null || libro.getAutores().isEmpty()) {
-                    System.out.println("No disponible");
-                } else {
-                    // Listar todos los autores separados por coma
-                    String autores = libro.getAutores().stream()
-                            .map(a -> a.getNombre())
-                            .reduce((a1, a2) -> a1 + ", " + a2)
-                            .orElse("No disponible");
-                    System.out.println(autores);
-                };
-                System.out.println("Idioma(s): ");
-                if (libro.getIdiomas() == null || libro.getIdiomas().isEmpty()){
-                    System.out.println("Idiomas no disponibles");
-                }else {
-                    String idiomas = String.join(",", libro.getIdiomas());
-                    System.out.println(idiomas);
-                }
-                System.out.println("Número de descargas: " + libro.getNumeroDeDescargas());
-                System.out.println("-------------------");
-
+                imprimirLibroFormato(libro);
             }
         } catch (Exception e) {
             System.out.println("Ocurrió un error al buscar el libro: " + e.getMessage());
             e.printStackTrace();
         }
     }
+    private void ListarLibrosRegistrados() {
+        List<Libro> libros = repositorio.findAllWithAutores();
+        for (Libro libro : libros) {
+            imprimirLibroFormato(libro);
+        }
+    }
+
 
 
 }

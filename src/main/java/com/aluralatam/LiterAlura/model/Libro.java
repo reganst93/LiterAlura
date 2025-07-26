@@ -16,12 +16,12 @@ public class Libro {
     @Column(name = "titulo")
     private String titulo;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(name = "libro_autor", joinColumns = @JoinColumn(name = "libro_id"), inverseJoinColumns = @JoinColumn(name= "autor_id"))
     @JsonAlias("authors")
     private List<Autor> autores;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "libro_idiomas", joinColumns = @JoinColumn(name = "libro_id"))
     @Column(name = "idioma")
     @JsonAlias("languages")
