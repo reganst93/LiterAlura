@@ -1,6 +1,8 @@
 package com.aluralatam.LiterAlura.principal;
 
+import com.aluralatam.LiterAlura.model.Autor;
 import com.aluralatam.LiterAlura.model.Libro;
+import com.aluralatam.LiterAlura.repository.AutorRepository;
 import com.aluralatam.LiterAlura.repository.LibroRepository;
 import com.aluralatam.LiterAlura.service.ConsumoApi;
 import com.aluralatam.LiterAlura.service.ConvierteDatos;
@@ -17,9 +19,10 @@ public class Principal {
     private ConsumoApi consumoApi = new ConsumoApi();
     private ConvierteDatos conversor = new ConvierteDatos();
     private Scanner teclado = new Scanner(System.in);
-
-    public Principal(LibroRepository repository){
+    private final AutorRepository autorRepository;
+    public Principal(LibroRepository repository, AutorRepository autorRepository){
         this.repositorio = repository;
+        this.autorRepository = autorRepository;
     }
 
 
@@ -32,6 +35,7 @@ public class Principal {
                     2 - Listar libros registrados
                     3 - Listar autores registrados
                     4 - Listar autores vivos en determinado año
+                    5 - Mostrar cantidad de libros por idioma
                     0 - Salir
                     """;
             System.out.println(menu);
@@ -43,14 +47,17 @@ public class Principal {
                     buscarLibroPorTitulo();
                     break;
                 case 2:
-                    ListarLibrosRegistrados();
+                    listarLibrosRegistrados();
                     break;
-                /*case 3:
-                    ListarAutoresRegistrados();
+                case 3:
+                    listarAutoresRegistrados();
                     break;
                 case 4:
-                    BuscarAutoresPorAnoNacimiento();
-                    break;*/
+                    buscarAutoresPorAnoNacimiento();
+                    break;
+                case 5:
+                    mostrarLibroPorIdioma();
+                    break;
                 case 0:
                     System.out.println("Gracias por usar la Aplicacion, Adios");
                     break;
@@ -59,6 +66,8 @@ public class Principal {
             }
         }
     }
+
+
 
 
     private void imprimirLibroFormato(Libro libro) {
@@ -114,15 +123,52 @@ public class Principal {
             e.printStackTrace();
         }
     }
-    private void ListarLibrosRegistrados() {
+    private void listarLibrosRegistrados() {
         List<Libro> libros = repositorio.findAllWithAutores();
         for (Libro libro : libros) {
             imprimirLibroFormato(libro);
         }
     }
 
+    private void listarAutoresRegistrados() {
+        List<Autor> autores = autorRepository.findAll();
+        if (autores.isEmpty()) {
+            System.out.println("No hay autores registrados.");
+        } else {
+            System.out.println("----- Autores Registrados -----");
+            autores.forEach(autor -> System.out.println(autor.getNombre()));
+            System.out.println("-------------------------------");
+        }
+    }
+    private void buscarAutoresPorAnoNacimiento() {
+        System.out.println("Ingrese el año para buscar autores nacidos hasta ese año:");
+        int ano = Integer.parseInt(teclado.nextLine());
+
+        List<Autor> autores = autorRepository.findAutoresNacidosAntesDeAno(ano);
+
+        if (autores.isEmpty()) {
+            System.out.println("No se encontraron autores nacidos hasta el año " + ano);
+        } else {
+            System.out.println("Autores nacidos hasta el año " + ano + ":");
+            autores.forEach(autor -> {
+                String nacimiento = (autor.getFechaDeNacimiento() == null || autor.getFechaDeNacimiento().isEmpty()) ? "N/A" : autor.getFechaDeNacimiento();
+                System.out.println(autor.getNombre() + " (Nacido: " + nacimiento + ")");
+            });
+        }
+    }
 
 
+    private void mostrarLibroPorIdioma() {
+        String idioma1 = "es";  // código para Español
+        String idioma2 = "en";  // código para Inglés
+
+        long cantidadIdioma1 = repositorio.findByIdiomasContaining(idioma1).size();
+        long cantidadIdioma2 = repositorio.findByIdiomasContaining(idioma2).size();
+
+        System.out.println("Cantidad de libros en Español (es): " + cantidadIdioma1);
+        System.out.println("Cantidad de libros en Inglés (en): " + cantidadIdioma2);
+    }
 }
+
 
 

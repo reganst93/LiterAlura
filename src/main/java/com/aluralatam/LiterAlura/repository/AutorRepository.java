@@ -9,7 +9,8 @@ import java.util.List;
 
 public interface AutorRepository extends JpaRepository<Autor,Long> {
     List<Autor> findAll();
-    @Query("SELECT a FROM Autor a WHERE a.nacimiento <= :ano AND (a.muerte IS NULL OR a.muerte >= :ano)")
-    List<Autor> findAutoresVivosEnAno(@Param("ano") int ano);
+    @Query(value = "SELECT * FROM autores a WHERE CAST(a.nacimiento AS INTEGER) <= :ano", nativeQuery = true)
+    List<Autor> findAutoresNacidosAntesDeAno(@Param("ano") int ano);
+
 
 }
